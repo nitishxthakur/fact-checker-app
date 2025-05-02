@@ -7,7 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1Gzfv4ZntJr90HXuovNR5eeW7IMv4cdPh
 """
 
-!pip install serpapi sentence-transformers scikit-learn
 
 import requests
 from sentence_transformers import SentenceTransformer
