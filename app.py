@@ -13,8 +13,6 @@ def extract_key_claims(text, num_sentences=2):
     sentences = re.split(r'(?<=[.!?]) +', text.strip())
     return " ".join(sentences[:num_sentences])
 
-download_nltk_punkt()
-
 # -------------------------------
 # Set page config FIRST
 # -------------------------------
