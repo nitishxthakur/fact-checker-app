@@ -8,7 +8,7 @@ import numpy as np
 import streamlit.components.v1 as components
 
 # Use components.html instead of HTML
-components.html("<p>My HTML content</p>")
+components.html
 
 import nltk
 nltk.download('punkt')
