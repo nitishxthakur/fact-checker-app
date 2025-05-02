@@ -1,27 +1,20 @@
 import streamlit as st
 import requests
+import re
 from sentence_transformers import SentenceTransformer
 from transformers import pipeline
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk.tokenize import sent_tokenize
 import numpy as np
-
-import re
-
-def extract_key_claims(text, num_sentences=2):
-    # Simple sentence splitter using punctuation
-    sentences = re.split(r'(?<=[.!?]) +', text.strip())
-    return " ".join(sentences[:num_sentences])
 
 # -------------------------------
 # Set page config FIRST
 # -------------------------------
-st.set_page_config(page_title="Live Fact Checker", page_icon="✅", layout="wide")
+st.set_page_config(page_title="Live Fact Checker", page_icon="✅")
 
 # -------------------------------
 # 1. CONFIG
 # -------------------------------
-SERPAPI_API_KEY = st.secrets["SERPAPI_API_KEY"]
+SERPAPI_API_KEY = "YOUR_SERPAPI_KEY"
 SEARCH_ENGINE = "google"
 MAX_SNIPPETS = 5
 
@@ -40,7 +33,7 @@ embedder, nli_pipeline = load_models()
 # 3. UTILITIES
 # -------------------------------
 def extract_key_claims(text, num_sentences=2):
-    sentences = sent_tokenize(text)
+    sentences = re.split(r'(?<=[.!?]) +', text.strip())
     return " ".join(sentences[:num_sentences])
 
 def serpapi_search(query, num_results=5):
@@ -86,7 +79,7 @@ def fact_check(article_text):
             filtered_snippets.append(snippet)
 
     if not filtered_snippets:
-        return "⚠️ No similar evidence found. Cannot verify.", snippets, claim
+        return "⚠️ No similar evidence found. Cannot verify.", [], claim
 
     entail = contradict = 0
     for snippet in filtered_snippets:
@@ -104,49 +97,26 @@ def fact_check(article_text):
         return "⚠️ Possibly Misleading or Unclear", filtered_snippets, claim
 
 # -------------------------------
-# 5. STREAMLIT APP UI
+# 5. STREAMLIT APP
 # -------------------------------
+st.title("🕵️ Live Fact Checking App")
 st.markdown("""
-    <style>
-    .title-style {
-        font-size: 2.5em;
-        font-weight: 700;
-        color: #2c3e50;
-        text-align: center;
-    }
-    .result-box {
-        background-color: #f0f2f6;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
-        font-size: 1.2em;
-    }
-    </style>
-""", unsafe_allow_html=True)
+This app verifies the factual accuracy of claims or news articles in real time using live web search and Natural Language Inference.
+""")
 
-st.markdown('<div class="title-style">🕵️ Live Fact Checking App</div>', unsafe_allow_html=True)
+article_input = st.text_area("Paste a news article or claim to verify:", height=250)
 
-with st.container():
-    st.subheader("🔎 Paste a news article or claim to verify:")
-    article_input = st.text_area("", height=250, placeholder="e.g., Scientists discover cure for common cold...")
+if st.button("Check Fact"):
+    if not article_input.strip():
+        st.warning("Please paste an article or claim.")
+    else:
+        with st.spinner("Fact-checking in progress..."):
+            result, evidence_snippets, claim = fact_check(article_input)
 
-    if st.button("🚀 Check Fact"):
-        if not article_input.strip():
-            st.warning("Please paste an article or claim.")
-        else:
-            with st.spinner("Analyzing..."):
-                result, evidence_snippets, claim = fact_check(article_input)
+        st.markdown(f"### 🧠 Extracted Claim: \n> {claim}")
+        st.markdown(f"### 🔍 Result: {result}")
 
-            st.markdown(f"""
-            <div class="result-box">
-            <strong>📝 Claim Analyzed:</strong><br> {claim}<br><br>
-            <strong>✅ Fact-Check Result:</strong><br> {result}
-            </div>
-            """, unsafe_allow_html=True)
-
-            if evidence_snippets:
-                with st.expander("🔍 View Retrieved Evidence"):
-                    for i, snippet in enumerate(evidence_snippets, 1):
-                        st.markdown(f"**{i}.** {snippet}")
-
-            st.info("This tool uses web search results and natural language inference to assess the factual accuracy of the claim. Interpret results carefully.")
+        if evidence_snippets:
+            st.markdown("### 🔗 Supporting Snippets from the Web:")
+            for i, snippet in enumerate(evidence_snippets, 1):
+                st.markdown(f"**{i}.** {snippet}")
