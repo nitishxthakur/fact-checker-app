@@ -1,4 +1,5 @@
 streamlit
-nltk
-sentence_transformers
-transformers
+requests
+sentence-transformers
+scikit-learn
+numpy
