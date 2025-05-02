@@ -6,8 +6,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import sent_tokenize
 import numpy as np
 
-import nltk
-nltk.download('punkt')
+@st.cache_resource
+def download_nltk_punkt():
+    import nltk
+    nltk.download("punkt")
+
+download_nltk_punkt()
+
 # -------------------------------
 # Set page config FIRST
 # -------------------------------
