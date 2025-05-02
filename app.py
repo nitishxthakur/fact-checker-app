@@ -5,8 +5,10 @@ from transformers import pipeline
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import sent_tokenize
 import numpy as np
-from streamlit.components.v1 import html
+from streamlit.components.v1 import HTML
 
+import nltk
+nltk.download('punkt')
 # -------------------------------
 # Set page config FIRST
 # -------------------------------
