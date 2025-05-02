@@ -6,10 +6,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import sent_tokenize
 import numpy as np
 
-@st.cache_resource
-def download_nltk_punkt():
-    import nltk
-    nltk.download("punkt")
+import re
+
+def extract_key_claims(text, num_sentences=2):
+    # Simple sentence splitter using punctuation
+    sentences = re.split(r'(?<=[.!?]) +', text.strip())
+    return " ".join(sentences[:num_sentences])
 
 download_nltk_punkt()
 
